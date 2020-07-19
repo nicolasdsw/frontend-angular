@@ -11,7 +11,6 @@ import { SearchUtil } from 'src/app/utils/search-util';
   providedIn: 'root',
 })
 export class PostsService {
-  // private serviceUrl = 'https://jsonplaceholder.typicode.com/posts';
   private serviceUrl = 'http://localhost:8080/api/posts';
 
   constructor(private http: HttpClient, private cacheService: CacheService) {}
