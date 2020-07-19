@@ -1,11 +1,11 @@
 import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
-import { Observable, Subject } from 'rxjs';
-import { PageRequest } from 'src/app/model/page-request';
-import { PageResponse } from 'src/app/model/page-response';
-import { CacheService } from 'src/app/services/cache.service';
+import { Observable } from 'rxjs';
 import { Post } from '../model/post';
-import { SearchUtil } from 'src/app/utils/search-util';
+import { PageRequest } from '../../spring-http/model/page-request';
+import { PageResponse } from '../../spring-http/model/page-response';
+import { SearchUtil } from '../../spring-http/utils/search-util';
+import { CacheService } from '../../spring-http/services/cache.service';
 
 @Injectable({
   providedIn: 'root',
@@ -15,7 +15,7 @@ export class PostsService {
 
   constructor(private http: HttpClient, private cacheService: CacheService) {}
 
-  findAll(filter?: any, pageRequest?: PageRequest): Observable<PageResponse<Post>> {
+  findAll(filter?: {}, pageRequest?: PageRequest): Observable<PageResponse<Post>> {
     const params = SearchUtil.convertParamsToHttpParams(filter, pageRequest);
     return this.cacheService.get(this.serviceUrl, { params });
   }
