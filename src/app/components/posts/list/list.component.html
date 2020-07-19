@@ -1,0 +1,9 @@
+<div *ngIf="posts$ | async as posts">
+  <p>{{ posts.content.length }} posts!</p>
+  <ul>
+    <li *ngFor="let post of posts.content">{{ post.title }} <button [routerLink]="[post.id]">Editar</button></li>
+  </ul>
+</div>
+<ng-template #loading>
+  Loading stuff...
+</ng-template>
