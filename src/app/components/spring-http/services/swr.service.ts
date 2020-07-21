@@ -6,7 +6,7 @@ import { take, tap } from 'rxjs/operators';
 @Injectable({
   providedIn: 'root',
 })
-export class CacheService {
+export class SwrService {
   // stale while revalidate
   private cache = new Map<string, Subject<any>>();
 

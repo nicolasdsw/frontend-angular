@@ -1,8 +1,44 @@
-<div *ngIf="posts$ | async as posts">
-  <p>{{ posts.content.length }} posts!</p>
-  <ul>
-    <li *ngFor="let post of posts.content">{{ post.title }} <button [routerLink]="[post.id]">Editar</button></li>
-  </ul>
+<div class="filters">
+  <form [formGroup]="filtersGroup" (submit)="submitFilters()">
+    <div>
+      <label>Title:&nbsp;</label>
+      <input type="text" formControlName="title" />
+    </div>
+    <button type="submit" [disabled]="!filtersGroup.valid">Pesquisar</button>
+  </form>
+</div>
+<br />
+<div *ngIf="posts$ | async as posts" class="table">
+  <select name="pageSize" id="pageSize" [formControl]="pageSizeControl">
+    <option [value]="null">Selecione</option>
+    <option *ngFor="let pageSizeOption of pageSizeOptions" [value]="pageSizeOption">{{ pageSizeOption }}</option>
+  </select>
+  <button (click)="prevPage()" [disabled]="posts.first">Prev</button>
+  <button (click)="nextPage()" [disabled]="posts.last">Next</button>
+  <p>{{ posts.totalElements }} posts!</p>
+  <table>
+    <thead>
+      <th>id</th>
+      <th>title</th>
+      <th>body</th>
+      <th>action</th>
+    </thead>
+    <tbody>
+      <tr *ngFor="let post of posts.content">
+        <td>{{ post.id }}</td>
+        <td>{{ post.title }}</td>
+        <td>
+          <span *ngIf="!post.body || post.body.length <= 150; else sliceText">{{ post.body }}</span>
+          <ng-template #sliceText>
+            <span> {{ post.body?.slice(0, 150) }}...</span>
+          </ng-template>
+        </td>
+        <td><button [routerLink]="[post.id]">Editar</button></td>
+      </tr>
+    </tbody>
+  </table>
+  <button (click)="prevPage()" [disabled]="posts.first">Prev</button>
+  <button (click)="nextPage()" [disabled]="posts.last">Next</button>
 </div>
 <ng-template #loading>
   Loading stuff...

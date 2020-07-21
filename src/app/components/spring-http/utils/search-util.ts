@@ -1,28 +1,21 @@
 import { HttpParams } from '@angular/common/http';
 
+const val = {};
 export class SearchUtil {
-  static convertParamsToHttpParams(...paramsArray: any[]): HttpParams {
-    let httpParams = new HttpParams();
-    if (!paramsArray) {
-      return httpParams;
-    }
-    paramsArray.forEach((params) => {
-      httpParams = SearchUtil.convertParamsObjectToHttpParams(httpParams, params);
-    });
-    return httpParams;
+  static extractFilled(obj: any): any {
+    return Object.entries(obj).reduce(
+      (a, [k, v]) => (v === undefined || v === null || v === '' ? a : ((a[k] = v), a)),
+      {},
+    );
   }
 
-  private static convertParamsObjectToHttpParams(httpParams: HttpParams, params: {}): HttpParams {
-    if (!params || !httpParams) {
-      return httpParams;
+  static convertParamsToHttpParams(...paramsArray: any[]): HttpParams {
+    if (!paramsArray) {
+      return null;
     }
-    Object.keys(params).forEach((key) => {
-      if (typeof params[key] === 'object') {
-        httpParams = httpParams.set(key, JSON.stringify(params[key]));
-      } else if (params[key]) {
-        httpParams = httpParams.set(key, params[key]);
-      }
-    });
+    const paramsArrayJoin = Object.assign({}, ...paramsArray);
+    const params = SearchUtil.extractFilled(paramsArrayJoin);
+    const httpParams = new HttpParams({ fromObject: params });
     return httpParams;
   }
 }
