@@ -1,58 +1,52 @@
 type SortDir = 'asc' | 'desc';
-class Sort {
-  by: string;
-  dir: SortDir;
 
-  constructor(by: string, dir: SortDir) {
-    this.by = by;
-    this.dir = dir;
-  }
-
-  static of(sort: string, validOptions?: string[]) {
-    let by = '';
-    let dir = 'asc';
-    if (sort.includes(',')) {
-      const p = sort.split(',');
-      by = p[0];
-      if (p[1] === 'desc') {
-        dir = 'desc';
-      }
-    } else {
-      by = sort;
+const getSortAndDirFromString = (sort: string, validOptions?: string[]) => {
+  let by = '';
+  let dir = 'asc';
+  if (sort.includes(',')) {
+    const p = sort.split(',');
+    by = p[0];
+    if (p[1] === 'desc') {
+      dir = 'desc';
     }
-    if (validOptions?.length && !validOptions.includes(by)) {
-      return null;
-    }
-    return new Sort(by, dir as SortDir);
+  } else {
+    by = sort;
   }
-
-  joinCols(): string {
-    return `${this.by},${this.dir}`;
+  if (validOptions?.length && !validOptions.includes(by)) {
+    return null;
   }
-}
+  return { by, dir };
+};
 
 export class PageRequest {
   page: number;
   size: number;
-  sort: Sort[];
+  sorts?: { [by: string]: SortDir } = {};
 
-  constructor(page: any, size: any, sort?: Sort[]) {
+  constructor(page: any, size: any, sorts?: {}) {
     this.page = page ? +page : undefined;
     this.size = size ? +size : undefined;
-    this.sort = sort;
+    this.sorts = sorts;
   }
 
   static of(page: any, size: any, sortArray: string[], sortOptions?: string[]) {
     return new PageRequest(page, size, PageRequest.convertToTheSortType(sortArray, sortOptions));
   }
 
-  private static convertToTheSortType(sort: string[], options?: string[]) {
-    if (sort) {
-      if (!Array.isArray(sort)) {
-        sort = [sort];
+  private static convertToTheSortType(sortsArr: string[], sortOptions?: string[]) {
+    const sorts = {};
+    if (sortsArr) {
+      if (!Array.isArray(sortsArr)) {
+        sortsArr = [sortsArr];
       }
-      return sort.map((s) => Sort.of(s, options)).filter((s) => s !== null);
+      sortsArr.forEach((sortItem) => {
+        const sort = getSortAndDirFromString(sortItem, sortOptions);
+        if (sort) {
+          sorts[sort.by] = sort.dir as SortDir;
+        }
+      });
     }
+    return sorts;
   }
 
   prev() {
@@ -68,39 +62,35 @@ export class PageRequest {
   }
 
   cleanSort() {
-    this.sort = [];
+    this.sorts = {};
   }
 
   addSort(by: string, dir: SortDir) {
-    if (!this.sort) {
-      this.cleanSort();
-    }
-    this.sort = [...this.sort, new Sort(by, dir)];
+    this.sorts[by] = dir;
   }
 
   addSortBy(by: string) {
-    const alreadyExists = this.sort?.filter((s) => s.by === by);
-    if (alreadyExists?.length) {
-      alreadyExists[0].dir = alreadyExists[0].dir === 'desc' ? 'asc' : 'desc';
-    } else {
-      this.addSort(by, 'asc');
-    }
+    this.addSort(by, this.sorts[by] === 'desc' ? 'asc' : 'desc');
   }
 
   setSort(by: string, dir: SortDir) {
-    this.sort = [];
-    this.addSort(by, dir);
+    this.sorts = {};
+    this.addSort(by, dir as SortDir);
   }
 
   setSortBy(by: string) {
-    const dir = this.sort?.filter((s) => s.by === by)[0]?.dir === 'asc' ? 'desc' : 'asc';
-    this.setSort(by, dir);
+    const dir = this.sorts[by] === 'asc' ? 'desc' : 'asc';
+    this.setSort(by, dir as SortDir);
   }
 
   toHttpParams() {
     const page = this.page;
     const size = this.size;
-    const sort = this.sort?.map((s) => s.joinCols());
+    const sort = [];
+    Object.keys(this.sorts).forEach((by) => {
+      const dir = this.sorts[by];
+      sort.push(`${by},${dir}`);
+    });
     return {
       page,
       size,

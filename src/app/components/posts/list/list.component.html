@@ -18,9 +18,19 @@
   <p>{{ posts.totalElements }} posts!</p>
   <table>
     <thead>
-      <th (click)="sort($event)" id="id">id</th>
-      <th (click)="sort($event)" id="title">title</th>
-      <th (click)="sort($event)" id="body">body</th>
+      <th (click)="sort('id', $event)" id="id">
+        <span>Id</span>
+        <span *ngIf="'asc' === pageRequest.sorts.id">▲</span><span *ngIf="'desc' === pageRequest.sorts.id">▼</span>
+      </th>
+      <th (click)="sort('title', $event)" id="title">
+        <span>Title</span>
+        <span *ngIf="'asc' === pageRequest.sorts.title">▲</span
+        ><span *ngIf="'desc' === pageRequest.sorts.title">▼</span>
+      </th>
+      <th (click)="sort('body', $event)" id="body">
+        <span>Body</span>
+        <span *ngIf="'asc' === pageRequest.sorts.body">▲</span><span *ngIf="'desc' === pageRequest.sorts.body">▼</span>
+      </th>
       <th id="action">action</th>
     </thead>
     <tbody>

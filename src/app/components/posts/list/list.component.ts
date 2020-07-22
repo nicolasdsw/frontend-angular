@@ -36,10 +36,7 @@ export class ListComponent implements OnInit {
 
       this.updatePageSizeControl(this.pageRequest);
       this.updateFilterGroup(this.filter);
-
-      if (this.filtersGroup.valid) {
-        this.posts$ = this.postService.findAll(this.filter, this.pageRequest);
-      }
+      this.loadData();
     });
   }
 
@@ -81,13 +78,11 @@ export class ListComponent implements OnInit {
     }
     this.router.navigate([], { queryParams });
   }
-  prevPage(): void {
-    this.pageRequest.prev();
-    this.updateQueryStringAndNavigate();
-  }
-  nextPage(): void {
-    this.pageRequest.next();
-    this.updateQueryStringAndNavigate();
+
+  private loadData() {
+    if (this.filtersGroup.valid) {
+      this.posts$ = this.postService.findAll(this.filter, this.pageRequest);
+    }
   }
 
   submitFilters() {
@@ -96,8 +91,17 @@ export class ListComponent implements OnInit {
     this.updateQueryStringAndNavigate();
   }
 
-  sort($event: any) {
-    const by = $event.target.id;
+  prevPage(): void {
+    this.pageRequest.prev();
+    this.updateQueryStringAndNavigate();
+  }
+
+  nextPage(): void {
+    this.pageRequest.next();
+    this.updateQueryStringAndNavigate();
+  }
+
+  sort(by: string, $event: any) {
     if ($event.shiftKey) {
       this.pageRequest.addSortBy(by);
     } else {
