@@ -18,10 +18,10 @@
   <p>{{ posts.totalElements }} posts!</p>
   <table>
     <thead>
-      <th>id</th>
-      <th>title</th>
-      <th>body</th>
-      <th>action</th>
+      <th (click)="sort($event)" id="id">id</th>
+      <th (click)="sort($event)" id="title">title</th>
+      <th (click)="sort($event)" id="body">body</th>
+      <th id="action">action</th>
     </thead>
     <tbody>
       <tr *ngFor="let post of posts.content">

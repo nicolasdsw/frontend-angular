@@ -14,8 +14,7 @@ export class SearchUtil {
       return null;
     }
     const paramsArrayJoin = Object.assign({}, ...paramsArray);
-    const params = SearchUtil.extractFilled(paramsArrayJoin);
-    const httpParams = new HttpParams({ fromObject: params });
-    return httpParams;
+    const query = SearchUtil.extractFilled(paramsArrayJoin);
+    return new HttpParams({ fromObject: query });
   }
 }

@@ -16,7 +16,8 @@ export class PostsService {
   constructor(private http: HttpClient, private swrService: SwrService) {}
 
   findAll(filter?: {}, pageRequest?: PageRequest): Observable<PageResponse<Post>> {
-    const params = SearchUtil.convertParamsToHttpParams(filter, pageRequest);
+    const pageReq = pageRequest.toHttpParams();
+    const params = SearchUtil.convertParamsToHttpParams(filter, pageReq);
     return this.swrService.get(this.serviceUrl, { params });
   }
 

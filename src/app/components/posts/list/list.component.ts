@@ -20,9 +20,10 @@ export class ListComponent implements OnInit {
   public filtersGroup: FormGroup;
   public pageSizeControl: FormControl;
   public pageSizeOptions = [5, 10, 50, 100];
+  public pageRequest: PageRequest;
 
+  private sortOptions = ['id', 'title', 'body'];
   private filter: Post;
-  private pageRequest: PageRequest;
   private pageSizeDefault = 10;
 
   constructor(private router: Router, private route: ActivatedRoute, private postService: PostsService) {}
@@ -30,7 +31,7 @@ export class ListComponent implements OnInit {
   ngOnInit(): void {
     this.initFormFields();
     this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
-      this.pageRequest = new PageRequest(page, size, sort);
+      this.pageRequest = PageRequest.of(page, size, sort, this.sortOptions);
       this.filter = new Post(filterParams);
 
       this.updatePageSizeControl(this.pageRequest);
@@ -74,7 +75,7 @@ export class ListComponent implements OnInit {
   }
 
   private updateQueryStringAndNavigate() {
-    const queryParams = SearchUtil.extractFilled({ ...this.pageRequest, ...this.filter });
+    const queryParams = SearchUtil.extractFilled({ ...this.pageRequest.toHttpParams(), ...this.filter });
     if (queryParams.page === 0) {
       delete queryParams.page;
     }
@@ -92,6 +93,16 @@ export class ListComponent implements OnInit {
   submitFilters() {
     this.filter = { ...this.filter, ...this.filtersGroup.value };
     this.pageRequest.page = 0;
+    this.updateQueryStringAndNavigate();
+  }
+
+  sort($event: any) {
+    const by = $event.target.id;
+    if ($event.shiftKey) {
+      this.pageRequest.addSortBy(by);
+    } else {
+      this.pageRequest.setSortBy(by);
+    }
     this.updateQueryStringAndNavigate();
   }
 }
