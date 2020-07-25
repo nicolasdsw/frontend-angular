@@ -1,7 +1,6 @@
 import { Component, OnInit } from '@angular/core';
 import { ActivatedRoute } from '@angular/router';
 import { Observable } from 'rxjs';
-import { shareReplay } from 'rxjs/operators';
 import { Post } from '../model/post';
 import { PostsService } from '../services/posts.service';
 

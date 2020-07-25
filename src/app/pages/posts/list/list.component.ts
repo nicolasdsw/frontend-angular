@@ -2,10 +2,11 @@ import { Component, OnInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
-import { PageRequest } from '../../spring-http/model/page-request';
-import { PageResponse } from '../../spring-http/model/page-response';
-import { SearchUtil } from '../../spring-http/utils/search-util';
+import { PageRequest } from 'src/app/shared/spring-http/model/page-request';
+import { PageResponse } from 'src/app/shared/spring-http/model/page-response';
+import { SearchUtil } from 'src/app/shared/spring-http/utils/search-util';
 import { Post } from '../model/post';
+import { PostFilter } from '../model/post-filter';
 import { PostsService } from '../services/posts.service';
 
 interface UrlParams extends PageRequest, Post {}
@@ -23,7 +24,7 @@ export class ListComponent implements OnInit {
   public pageRequest: PageRequest;
 
   private sortOptions = ['id', 'title', 'body'];
-  private filter: Post;
+  private filter: PostFilter;
   private pageSizeDefault = 10;
 
   constructor(private router: Router, private route: ActivatedRoute, private postService: PostsService) {}
@@ -32,8 +33,9 @@ export class ListComponent implements OnInit {
     this.initFormFields();
     this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
       this.pageRequest = PageRequest.of(page, size, sort, this.sortOptions);
-      this.filter = new Post(filterParams);
+      this.filter = new PostFilter(filterParams);
 
+      console.log(this.filter);
       this.updatePageSizeControl(this.pageRequest);
       this.updateFilterGroup(this.filter);
       this.loadData();
@@ -43,7 +45,10 @@ export class ListComponent implements OnInit {
   private initFormFields() {
     this.pageSizeControl = new FormControl(this.pageSizeDefault);
     this.filtersGroup = new FormGroup({
+      any: new FormControl(''),
+      id: new FormControl(),
       title: new FormControl(''),
+      body: new FormControl(''),
     });
     this.pageSizeControl.valueChanges.subscribe((newVal) => {
       const newValNumber = +newVal || null;

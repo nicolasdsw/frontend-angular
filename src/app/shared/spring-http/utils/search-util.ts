@@ -1,6 +1,5 @@
 import { HttpParams } from '@angular/common/http';
 
-const val = {};
 export class SearchUtil {
   static extractFilled(obj: any): any {
     return Object.entries(obj).reduce(

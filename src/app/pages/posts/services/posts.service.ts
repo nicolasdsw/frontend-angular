@@ -2,10 +2,10 @@ import { HttpClient } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { Observable } from 'rxjs';
 import { Post } from '../model/post';
-import { PageRequest } from '../../spring-http/model/page-request';
-import { PageResponse } from '../../spring-http/model/page-response';
-import { SearchUtil } from '../../spring-http/utils/search-util';
-import { SwrService } from '../../spring-http/services/swr.service';
+import { SwrService } from 'src/app/shared/spring-http/services/swr.service';
+import { PageRequest } from 'src/app/shared/spring-http/model/page-request';
+import { PageResponse } from 'src/app/shared/spring-http/model/page-response';
+import { SearchUtil } from 'src/app/shared/spring-http/utils/search-util';
 
 @Injectable({
   providedIn: 'root',

@@ -1,8 +1,20 @@
 <div class="filters">
   <form [formGroup]="filtersGroup" (submit)="submitFilters()">
     <div>
+      <label>Any Field:&nbsp;</label>
+      <input type="text" formControlName="any" />
+    </div>
+    <div>
+      <label>Id:&nbsp;</label>
+      <input type="number" formControlName="id" />
+    </div>
+    <div>
       <label>Title:&nbsp;</label>
       <input type="text" formControlName="title" />
+    </div>
+    <div>
+      <label>Body:&nbsp;</label>
+      <input type="text" formControlName="body" />
     </div>
     <button type="submit" [disabled]="!filtersGroup.valid">Pesquisar</button>
   </form>
@@ -18,18 +30,17 @@
   <p>{{ posts.totalElements }} posts!</p>
   <table>
     <thead>
-      <th (click)="sort('id', $event)" id="id">
+      <th id="id" (click)="sort('id', $event)">
         <span>Id</span>
-        <span *ngIf="'asc' === pageRequest.sorts.id">▲</span><span *ngIf="'desc' === pageRequest.sorts.id">▼</span>
+        <app-sort-icon [sortDir]="pageRequest.sorts.id"></app-sort-icon>
       </th>
-      <th (click)="sort('title', $event)" id="title">
+      <th id="title" (click)="sort('title', $event)">
         <span>Title</span>
-        <span *ngIf="'asc' === pageRequest.sorts.title">▲</span
-        ><span *ngIf="'desc' === pageRequest.sorts.title">▼</span>
+        <app-sort-icon [sortDir]="pageRequest.sorts.title"></app-sort-icon>
       </th>
-      <th (click)="sort('body', $event)" id="body">
+      <th id="body" (click)="sort('body', $event)">
         <span>Body</span>
-        <span *ngIf="'asc' === pageRequest.sorts.body">▲</span><span *ngIf="'desc' === pageRequest.sorts.body">▼</span>
+        <app-sort-icon [sortDir]="pageRequest.sorts.body"></app-sort-icon>
       </th>
       <th id="action">action</th>
     </thead>

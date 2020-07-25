@@ -1,0 +1,5 @@
+<span *ngIf="sortDir">
+  <ng-template *ngIf="'asc' === sortDir; then thenBlock; else elseBlock"></ng-template>
+</span>
+<ng-template #thenBlock>▲</ng-template>
+<ng-template #elseBlock>▼</ng-template>
