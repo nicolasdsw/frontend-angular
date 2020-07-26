@@ -23,7 +23,7 @@ export class PageRequest {
   size: number;
   sorts?: { [by: string]: SortDir } = {};
 
-  constructor(page: any, size: any, sorts?: {}) {
+  constructor(page?: any, size?: any, sorts?: {}) {
     this.page = page ? +page : undefined;
     this.size = size ? +size : undefined;
     this.sorts = sorts;
@@ -81,6 +81,22 @@ export class PageRequest {
   setSortBy(by: string) {
     const dir = this.sorts[by] === 'asc' ? 'desc' : 'asc';
     this.setSort(by, dir as SortDir);
+  }
+
+  removeSort(by: string) {
+    if (this.sorts[by]) {
+      delete this.sorts[by];
+    }
+  }
+
+  sortChange(by: string, $event: any) {
+    if ($event.ctrlKey) {
+      this.removeSort(by);
+    } else if ($event.shiftKey) {
+      this.addSortBy(by);
+    } else {
+      this.setSortBy(by);
+    }
   }
 
   toHttpParams() {

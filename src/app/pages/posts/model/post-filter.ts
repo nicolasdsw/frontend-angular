@@ -8,10 +8,13 @@ export class PostFilter {
   constructor(obj?: any) {
     if (obj) {
       this.any = obj.any;
-      this.id = obj.id;
+      this.id = +obj.id;
       this.title = obj.title;
       this.body = obj.body;
       this.userId = obj.userId;
+      if (isNaN(this.id)) {
+        this.id = null;
+      }
     }
   }
 }

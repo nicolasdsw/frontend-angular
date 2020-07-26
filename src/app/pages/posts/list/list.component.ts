@@ -1,15 +1,16 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, AfterViewInit } from '@angular/core';
 import { FormControl, FormGroup } from '@angular/forms';
 import { ActivatedRoute, Router } from '@angular/router';
 import { Observable } from 'rxjs';
 import { PageRequest } from 'src/app/shared/spring-http/model/page-request';
 import { PageResponse } from 'src/app/shared/spring-http/model/page-response';
-import { SearchUtil } from 'src/app/shared/spring-http/utils/search-util';
+import { ListUtil } from 'src/app/shared/spring-http/utils/list-util';
 import { Post } from '../model/post';
 import { PostFilter } from '../model/post-filter';
 import { PostsService } from '../services/posts.service';
-
-interface UrlParams extends PageRequest, Post {}
+import { ListSize } from 'src/app/shared/spring-http/model/list-size';
+import { ListFilter } from 'src/app/shared/spring-http/model/list-filter';
+import { ListConfig } from 'src/app/shared/spring-http/model/list-config';
 
 @Component({
   selector: 'app-list',
@@ -17,101 +18,71 @@ interface UrlParams extends PageRequest, Post {}
   styleUrls: ['./list.component.scss'],
 })
 export class ListComponent implements OnInit {
-  public posts$: Observable<PageResponse<Post>>;
-  public filtersGroup: FormGroup;
-  public pageSizeControl: FormControl;
-  public pageSizeOptions = [5, 10, 50, 100];
-  public pageRequest: PageRequest;
-
-  private sortOptions = ['id', 'title', 'body'];
-  private filter: PostFilter;
-  private pageSizeDefault = 10;
+  posts$: Observable<PageResponse<Post>>;
+  listFilter = new ListFilter(
+    new FormGroup({
+      any: new FormControl(''),
+      id: new FormControl(null),
+      title: new FormControl(''),
+      body: new FormControl(''),
+    }),
+  );
+  listConfig: ListConfig = {
+    listSize: new ListSize(new FormControl(10), [5, 10, 50, 100]),
+    sortOptions: ['id', 'title', 'body'],
+    pageRequest: new PageRequest(),
+  };
 
   constructor(private router: Router, private route: ActivatedRoute, private postService: PostsService) {}
 
   ngOnInit(): void {
-    this.initFormFields();
-    this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
-      this.pageRequest = PageRequest.of(page, size, sort, this.sortOptions);
-      this.filter = new PostFilter(filterParams);
+    this.listConfig.listSize.control.valueChanges.subscribe((newVal) => this.pageSizeChange(newVal));
 
-      console.log(this.filter);
-      this.updatePageSizeControl(this.pageRequest);
-      this.updateFilterGroup(this.filter);
+    this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
+      this.listConfig.pageRequest = PageRequest.of(page, size, sort, this.listConfig.sortOptions);
+      this.listFilter.setFilterAndUpdateFormGroup(new PostFilter(filterParams));
+      ListUtil.updatePageSizeControl(this.listConfig.pageRequest, this.listConfig.listSize);
       this.loadData();
     });
   }
 
-  private initFormFields() {
-    this.pageSizeControl = new FormControl(this.pageSizeDefault);
-    this.filtersGroup = new FormGroup({
-      any: new FormControl(''),
-      id: new FormControl(),
-      title: new FormControl(''),
-      body: new FormControl(''),
-    });
-    this.pageSizeControl.valueChanges.subscribe((newVal) => {
-      const newValNumber = +newVal || null;
-      if (newValNumber && newValNumber !== this.pageRequest.size) {
-        this.pageRequest.size = newValNumber;
-        this.updateQueryStringAndNavigate();
-      }
-    });
-  }
-
-  private updatePageSizeControl(pageRequest: PageRequest) {
-    if (pageRequest.size) {
-      const val = this.pageSizeOptions.includes(pageRequest.size) ? pageRequest.size : null;
-      this.pageSizeControl.setValue(val, { emitEvent: false });
-    } else {
-      this.pageSizeControl.setValue(this.pageSizeDefault, { emitEvent: false });
+  private loadData() {
+    if (this.listFilter.formGroup.valid) {
+      this.posts$ = this.postService.findAll(this.listFilter.filter, this.listConfig.pageRequest);
     }
-  }
-
-  private updateFilterGroup(filter: Post) {
-    const formGroup = this.filtersGroup.value;
-    Object.keys(formGroup).forEach(
-      (key) => (formGroup[key] = filter[key] === null || filter[key] === undefined ? '' : filter[key]),
-    );
-    this.filtersGroup.setValue(formGroup);
   }
 
   private updateQueryStringAndNavigate() {
-    const queryParams = SearchUtil.extractFilled({ ...this.pageRequest.toHttpParams(), ...this.filter });
-    if (queryParams.page === 0) {
-      delete queryParams.page;
-    }
+    const queryParams = ListUtil.buildQueryParams(this.listConfig.pageRequest, this.listFilter.filter);
     this.router.navigate([], { queryParams });
   }
 
-  private loadData() {
-    if (this.filtersGroup.valid) {
-      this.posts$ = this.postService.findAll(this.filter, this.pageRequest);
+  private pageSizeChange(newVal: any) {
+    const newValNumber = +newVal || null;
+    if (newValNumber && newValNumber !== this.listConfig.pageRequest.size) {
+      this.listConfig.pageRequest.size = newValNumber;
+      this.updateQueryStringAndNavigate();
     }
   }
 
   submitFilters() {
-    this.filter = { ...this.filter, ...this.filtersGroup.value };
-    this.pageRequest.page = 0;
+    this.listFilter.updateFilterWithFormGroupValues();
+    this.listConfig.pageRequest.page = 0;
     this.updateQueryStringAndNavigate();
   }
 
   prevPage(): void {
-    this.pageRequest.prev();
+    this.listConfig.pageRequest.prev();
     this.updateQueryStringAndNavigate();
   }
 
   nextPage(): void {
-    this.pageRequest.next();
+    this.listConfig.pageRequest.next();
     this.updateQueryStringAndNavigate();
   }
 
-  sort(by: string, $event: any) {
-    if ($event.shiftKey) {
-      this.pageRequest.addSortBy(by);
-    } else {
-      this.pageRequest.setSortBy(by);
-    }
+  sortChange(by: string, $event: any) {
+    this.listConfig.pageRequest.sortChange(by, $event);
     this.updateQueryStringAndNavigate();
   }
 }

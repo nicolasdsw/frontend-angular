@@ -1,5 +1,5 @@
 import { Component, OnInit, Input } from '@angular/core';
-
+import { faArrowUp, faArrowDown } from '@fortawesome/free-solid-svg-icons';
 @Component({
   selector: 'app-sort-icon',
   templateUrl: './sort-icon.component.html',
@@ -8,6 +8,8 @@ import { Component, OnInit, Input } from '@angular/core';
 export class SortIconComponent implements OnInit {
   @Input()
   sortDir: 'asc' | 'desc';
+  arrowUp = faArrowUp;
+  arrowDown = faArrowDown;
 
   constructor() {}
 

@@ -1,5 +1,5 @@
-<span *ngIf="sortDir">
+<ng-template [ngIf]="sortDir">
   <ng-template *ngIf="'asc' === sortDir; then thenBlock; else elseBlock"></ng-template>
-</span>
-<ng-template #thenBlock>▲</ng-template>
-<ng-template #elseBlock>▼</ng-template>
+</ng-template>
+<ng-template #thenBlock><fa-icon [icon]="arrowUp"></fa-icon></ng-template>
+<ng-template #elseBlock><fa-icon [icon]="arrowDown"></fa-icon></ng-template>

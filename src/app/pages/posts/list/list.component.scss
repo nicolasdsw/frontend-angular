@@ -1,0 +1,66 @@
+.bootstrap4Table {
+  border: 1px solid #dee2e6;
+  width: 100%;
+  margin-bottom: 1rem;
+  color: #212529;
+  border-collapse: collapse;
+  display: table;
+}
+
+.bootstrap4Table thead {
+  display: table-header-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+.bootstrap4Table thead th {
+  border-bottom-width: 2px;
+  vertical-align: bottom;
+  border-bottom: 2px solid #dee2e6;
+  border: 1px solid #dee2e6;
+  text-align: inherit;
+}
+
+.bootstrap4Table tbody {
+  display: table-row-group;
+  vertical-align: middle;
+  border-color: inherit;
+}
+
+.bootstrap4Table tbody tr {
+  display: table-row;
+  vertical-align: inherit;
+  border-color: inherit;
+  display: table-row;
+  vertical-align: inherit;
+  border-color: inherit;
+}
+
+.bootstrap4Table tbody tr td {
+  border: 1px solid #dee2e6;
+  padding: 0.75rem;
+  vertical-align: top;
+  display: table-cell;
+}
+
+.bootstrap4Table td,
+.bootstrap4Table th {
+  padding: 0.75rem;
+}
+
+.bootstrap4Table tbody tr:nth-of-type(odd) {
+  background-color: rgba(0, 0, 0, 0.05);
+}
+
+.bootstrap4Table,
+::after,
+::before {
+  box-sizing: border-box;
+}
+
+.bootstrap4Table thead th .sort-right {
+  display: flex;
+  flex-wrap: nowrap;
+  flex-direction: row;
+  justify-content: space-between;
+}

@@ -1,5 +1,5 @@
 <div class="filters">
-  <form [formGroup]="filtersGroup" (submit)="submitFilters()">
+  <form [formGroup]="listFilter.formGroup" (submit)="submitFilters()">
     <div>
       <label>Any Field:&nbsp;</label>
       <input type="text" formControlName="any" />
@@ -16,31 +16,42 @@
       <label>Body:&nbsp;</label>
       <input type="text" formControlName="body" />
     </div>
-    <button type="submit" [disabled]="!filtersGroup.valid">Pesquisar</button>
+    <button type="submit" [disabled]="!listFilter.formGroup.valid">Pesquisar</button>
+    <button type="button" [disabled]="listFilter.disableClean" (click)="listFilter.cleanFilters()">
+      Limpar Filtros
+    </button>
   </form>
 </div>
 <br />
 <div *ngIf="posts$ | async as posts" class="table">
-  <select name="pageSize" id="pageSize" [formControl]="pageSizeControl">
+  <select name="pageSize" id="pageSize" [formControl]="listConfig.listSize.control">
     <option [value]="null">Selecione</option>
-    <option *ngFor="let pageSizeOption of pageSizeOptions" [value]="pageSizeOption">{{ pageSizeOption }}</option>
+    <option *ngFor="let pageSizeOption of listConfig.listSize.options" [value]="pageSizeOption">{{
+      pageSizeOption
+    }}</option>
   </select>
   <button (click)="prevPage()" [disabled]="posts.first">Prev</button>
   <button (click)="nextPage()" [disabled]="posts.last">Next</button>
-  <p>{{ posts.totalElements }} posts!</p>
-  <table>
+  <h2>Total: {{ posts.totalElements }} posts!</h2>
+  <table class="bootstrap4Table" style="width: max-content;">
     <thead>
-      <th id="id" (click)="sort('id', $event)">
-        <span>Id</span>
-        <app-sort-icon [sortDir]="pageRequest.sorts.id"></app-sort-icon>
+      <th id="id" (click)="sortChange('id', $event)">
+        <div class="sort-right">
+          <span>Id</span>
+          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.id"></app-sort-icon>
+        </div>
       </th>
-      <th id="title" (click)="sort('title', $event)">
-        <span>Title</span>
-        <app-sort-icon [sortDir]="pageRequest.sorts.title"></app-sort-icon>
+      <th id="title" (click)="sortChange('title', $event)">
+        <div class="sort-right">
+          <span>Title</span>
+          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.title"></app-sort-icon>
+        </div>
       </th>
-      <th id="body" (click)="sort('body', $event)">
-        <span>Body</span>
-        <app-sort-icon [sortDir]="pageRequest.sorts.body"></app-sort-icon>
+      <th id="body" (click)="sortChange('body', $event)">
+        <div class="sort-right">
+          <span>Body</span>
+          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.body"></app-sort-icon>
+        </div>
       </th>
       <th id="action">action</th>
     </thead>
