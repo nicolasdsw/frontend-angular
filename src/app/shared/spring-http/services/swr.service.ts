@@ -9,6 +9,7 @@ import { take, tap } from 'rxjs/operators';
 export class SwrService {
   // stale while revalidate
   private cache = new Map<string, Subject<any>>();
+  private cacheCountUpdates = new Map<string, number>();
 
   constructor(private http: HttpClient) {}
 
@@ -30,7 +31,9 @@ export class SwrService {
       .pipe(
         take(1),
         tap((res: any) => {
-          this.cache.get(requestCode).next(res);
+          const cacheCount = (this.cacheCountUpdates.get(requestCode) || 0) + 1;
+          this.cacheCountUpdates.set(requestCode, cacheCount);
+          this.cache.get(requestCode).next({ ...res, cacheCount });
         }),
       )
       .subscribe();

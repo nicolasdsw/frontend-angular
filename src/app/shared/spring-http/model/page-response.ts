@@ -1,6 +1,7 @@
 import { PageRequest } from './page-request';
 
 export interface PageResponse<T> {
+  cacheCount: number;
   totalPages: number;
   totalElements: number;
   size: number;

@@ -1,5 +1,34 @@
 import { FormGroup } from '@angular/forms';
-import { ListUtil } from '../utils/list-util';
+
+function isFormGroupUnset(formGroup: FormGroup, defaultValues: { [key: string]: any }) {
+  if (!formGroup) {
+    return true;
+  }
+  const filterKeys = Object.keys(defaultValues);
+  for (const key of filterKeys) {
+    if (defaultValues[key] !== formGroup.get(key)?.value) {
+      return false;
+    }
+  }
+  return true;
+}
+
+function updateFormGroup(formGroup: FormGroup, data?: { [key: string]: any }) {
+  if (!data) {
+    data = {};
+  }
+  const formGroupValue = formGroup.value;
+  Object.keys(formGroupValue).forEach((key) => {
+    if (formGroupValue[key] instanceof String || typeof formGroupValue[key] === 'string') {
+      formGroupValue[key] = data[key] === undefined || data[key] === null ? '' : data[key];
+    } else if (typeof formGroupValue[key] === 'boolean') {
+      formGroupValue[key] = data[key] || false;
+    } else {
+      formGroupValue[key] = data[key] === undefined ? null : data[key];
+    }
+  });
+  formGroup.setValue(formGroupValue);
+}
 
 export class ListFilter {
   formGroup: FormGroup;
@@ -12,17 +41,17 @@ export class ListFilter {
     this.defaultValues = { ...filtersGroup.value };
     this.filter = filter;
     this.formGroup.valueChanges.subscribe(() => {
-      this.disableClean = ListUtil.isFormGroupUnset(this.formGroup, this.defaultValues);
+      this.disableClean = isFormGroupUnset(this.formGroup, this.defaultValues);
     });
   }
 
   cleanFilters() {
-    ListUtil.updateFormGroup(this.formGroup, this.defaultValues);
+    updateFormGroup(this.formGroup, this.defaultValues);
   }
 
   setFilterAndUpdateFormGroup(filter: any) {
     this.filter = filter;
-    ListUtil.updateFormGroup(this.formGroup, this.filter);
+    updateFormGroup(this.formGroup, this.filter);
   }
 
   updateFilterWithFormGroupValues() {

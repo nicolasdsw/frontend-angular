@@ -24,33 +24,31 @@
 </div>
 <br />
 <div *ngIf="posts$ | async as posts" class="table">
-  <select name="pageSize" id="pageSize" [formControl]="listConfig.listSize.control">
+  <select name="pageSize" id="pageSize" [formControl]="listConfig.sizeControl">
     <option [value]="null">Selecione</option>
-    <option *ngFor="let pageSizeOption of listConfig.listSize.options" [value]="pageSizeOption">{{
-      pageSizeOption
-    }}</option>
+    <option *ngFor="let pageSizeOption of listConfig.sizeOptions" [value]="pageSizeOption">{{ pageSizeOption }}</option>
   </select>
-  <button (click)="prevPage()" [disabled]="posts.first">Prev</button>
-  <button (click)="nextPage()" [disabled]="posts.last">Next</button>
+  <button (click)="listConfig.prevPage()" [disabled]="posts.first">Prev</button>
+  <button (click)="listConfig.nextPage()" [disabled]="posts.last">Next</button>
   <h2>Total: {{ posts.totalElements }} posts!</h2>
   <table class="bootstrap4Table" style="width: max-content;">
     <thead>
-      <th id="id" (click)="sortChange('id', $event)">
+      <th id="id" (click)="listConfig.sortChange('id', $event)">
         <div class="sort-right">
           <span>Id</span>
-          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.id"></app-sort-icon>
+          <app-sort-icon [sortDir]="listConfig.sorts.id"></app-sort-icon>
         </div>
       </th>
-      <th id="title" (click)="sortChange('title', $event)">
+      <th id="title" (click)="listConfig.sortChange('title', $event)">
         <div class="sort-right">
           <span>Title</span>
-          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.title"></app-sort-icon>
+          <app-sort-icon [sortDir]="listConfig.sorts.title"></app-sort-icon>
         </div>
       </th>
-      <th id="body" (click)="sortChange('body', $event)">
+      <th id="body" (click)="listConfig.sortChange('body', $event)">
         <div class="sort-right">
           <span>Body</span>
-          <app-sort-icon [sortDir]="listConfig.pageRequest.sorts.body"></app-sort-icon>
+          <app-sort-icon [sortDir]="listConfig.sorts.body"></app-sort-icon>
         </div>
       </th>
       <th id="action">action</th>
@@ -69,8 +67,8 @@
       </tr>
     </tbody>
   </table>
-  <button (click)="prevPage()" [disabled]="posts.first">Prev</button>
-  <button (click)="nextPage()" [disabled]="posts.last">Next</button>
+  <button (click)="listConfig.prevPage()" [disabled]="posts.first">Prev</button>
+  <button (click)="listConfig.nextPage()" [disabled]="posts.last">Next</button>
 </div>
 <ng-template #loading>
   Loading stuff...
