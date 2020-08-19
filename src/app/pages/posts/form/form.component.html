@@ -1,4 +1,17 @@
 <div *ngIf="post$ | async as post">
-  <h3>{{ post.title }}</h3>
-  <p>{{ post.body }}</p>
+  <label *ngIf="mode === 'edit'">Id:&nbsp;{{ post.id }}</label>
+  <form [formGroup]="formGroup" (submit)="submit()">
+    <div>
+      <label>Title:&nbsp;</label>
+      <input type="text" formControlName="title" />
+    </div>
+    <div>
+      <label>Body:&nbsp;</label>
+      <textarea type="text" formControlName="body"></textarea>
+    </div>
+    <button type="submit" [disabled]="!formGroup.valid">Salvar</button>
+    <button type="button" (click)="goBack()">
+      Voltar
+    </button>
+  </form>
 </div>
