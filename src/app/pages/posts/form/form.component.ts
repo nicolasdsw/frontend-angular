@@ -22,12 +22,7 @@ export class FormComponent implements OnInit {
   private object: Post;
   private emptyObject: Post = { title: '', body: '', id: null, userId: null };
 
-  constructor(
-    private router: Router,
-    private route: ActivatedRoute,
-    private location: Location,
-    private postService: PostsService,
-  ) {}
+  constructor(private router: Router, private route: ActivatedRoute, private postService: PostsService) {}
 
   ngOnInit(): void {
     this.route.params.subscribe(({ id }) => {
@@ -39,9 +34,9 @@ export class FormComponent implements OnInit {
         this.mode = 'edit';
         loadSub = this.postService.findById(+id);
       } else {
-        this.goBack();
+        this.goToList();
       }
-      this.post$ = loadSub.pipe(
+      this.post$ = loadSub?.pipe(
         map((post) => {
           if (post) {
             this.object = post;
@@ -61,7 +56,7 @@ export class FormComponent implements OnInit {
       add: (object: Post) => {
         this.postService.insert(object).subscribe((id) => {
           alert(`${id} Cadastrado com sucesso`);
-          this.router.navigate(['./', id]);
+          this.router.navigate(['../', id], { relativeTo: this.route });
         });
       },
       edit: (object: Post) => {
@@ -75,7 +70,7 @@ export class FormComponent implements OnInit {
     save[this.mode](objectToSend);
   }
 
-  goBack() {
-    this.location.back();
+  goToList() {
+    this.router.navigate(['../'], { relativeTo: this.route });
   }
 }
