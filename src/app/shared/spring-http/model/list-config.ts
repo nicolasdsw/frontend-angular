@@ -198,6 +198,10 @@ export class ListConfig {
     }
   }
 
+  firstPage() {
+    this.setPage(1);
+  }
+
   nextPage() {
     const page = this.page || 1;
     this.setPage(page + 1);
@@ -206,10 +210,6 @@ export class ListConfig {
   setPage(page: number) {
     this.page = page || 1;
     this.pageCallback();
-  }
-
-  isCurrentPage(page: number) {
-    return this.page === page;
   }
 
   buildQueryParams(filter: any) {
@@ -267,5 +267,11 @@ export class ListConfig {
       }
     }
     return end;
+  }
+
+  validatePage(responsePage: PageResponse<any>) {
+    if (responsePage && responsePage.number + 1 > responsePage.totalPages) {
+      this.setPage(responsePage.totalPages);
+    }
   }
 }

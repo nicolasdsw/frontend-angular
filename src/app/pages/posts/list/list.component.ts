@@ -8,6 +8,7 @@ import { PageResponse } from 'src/app/shared/spring-http/model/page-response';
 import { Post } from '../model/post';
 import { PostFilter } from '../model/post-filter';
 import { PostsService } from '../services/posts.service';
+import { tap } from 'rxjs/operators';
 
 @Component({
   selector: 'app-list',
@@ -33,28 +34,29 @@ export class ListComponent implements OnInit {
   constructor(private router: Router, private route: ActivatedRoute, private postService: PostsService) {}
 
   ngOnInit(): void {
-    this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
-      this.listConfig.setQueryStringValues(page, size, sort);
-      this.listFilter.setFilterAndUpdateFormGroup(new PostFilter(filterParams));
-      this.loadData();
-    });
     this.listConfig.onParamsChange = () => this.updateQueryStringAndNavigate();
-  }
-
-  private loadData() {
-    if (this.listFilter.formGroup.valid) {
-      this.posts$ = this.postService.findAll(this.listFilter.filter, this.listConfig.getPageRequest());
-    }
+    this.route.queryParams.subscribe(({ page, size, sort, ...filterParams }) => {
+      this.listFilter.setFilterAndUpdateFormGroup(new PostFilter(filterParams));
+      this.listConfig.setQueryStringValues(+page, size, sort);
+      if (page === '0' || page === '1') {
+        this.listConfig.setPage(1);
+      } else if (this.listFilter.formGroup.valid) {
+        this.posts$ = this.postService
+          .findAll(this.listFilter.filter, this.listConfig.getPageRequest())
+          .pipe(tap((responsePage) => this.listConfig.validatePage(responsePage)));
+      }
+    });
   }
 
   private updateQueryStringAndNavigate() {
     const queryParams = this.listConfig.buildQueryParams(this.listFilter.filter);
+    console.log(queryParams);
     this.router.navigate([], { queryParams });
   }
 
   submitFilters() {
     this.listFilter.updateFilterWithFormGroupValues();
-    this.listConfig.page = 0;
+    this.listConfig.page = 1;
     this.updateQueryStringAndNavigate();
   }
 }

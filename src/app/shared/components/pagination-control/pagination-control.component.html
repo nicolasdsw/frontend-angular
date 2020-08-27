@@ -1,4 +1,4 @@
-<div class="pagination">
+<div class="pagination-control">
   <div>
     <label>Itens por Página:&nbsp;</label>
     <select name="pageSize" id="pageSize" [formControl]="listConfig.sizeControl">
@@ -15,12 +15,12 @@
     >
   </div>
   <div class="pagination-control">
-    <button (click)="listConfig.setPage(1)" [disabled]="pageResponse.first">First</button>
+    <button (click)="listConfig.firstPage()" [disabled]="pageResponse.first">First</button>
     <button (click)="listConfig.prevPage()" [disabled]="pageResponse.first">Prev</button>
     <button
       *ngFor="let pageNum of listConfig.buildPaginationControls(pageResponse)"
       (click)="listConfig.setPage(pageNum)"
-      [disabled]="listConfig.isCurrentPage(pageNum)"
+      [disabled]="pageResponse.number === pageNum - 1"
     >
       {{ pageNum }}
     </button>

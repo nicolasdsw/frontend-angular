@@ -25,7 +25,9 @@
 <br />
 <div *ngIf="posts$ | async as posts" class="table">
   <h2>Total: {{ posts.totalElements }} posts!</h2>
-  <app-pagination-control class="pagination" [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
+  <div class="pagination">
+    <app-pagination-control [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
+  </div>
   <table class="bootstrap4Table">
     <thead>
       <th id="id" (click)="listConfig.sortChange('id', $event)">
@@ -62,6 +64,8 @@
       </tr>
     </tbody>
   </table>
-  <app-pagination-control class="pagination" [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
+  <div class="pagination">
+    <app-pagination-control [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
+  </div>
 </div>
 <ng-template #loading> Loading stuff... </ng-template>
