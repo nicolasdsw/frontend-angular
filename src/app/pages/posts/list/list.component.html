@@ -24,14 +24,9 @@
 </div>
 <br />
 <div *ngIf="posts$ | async as posts" class="table">
-  <select name="pageSize" id="pageSize" [formControl]="listConfig.sizeControl">
-    <option [value]="null">Selecione</option>
-    <option *ngFor="let pageSizeOption of listConfig.sizeOptions" [value]="pageSizeOption">{{ pageSizeOption }}</option>
-  </select>
-  <button (click)="listConfig.prevPage()" [disabled]="posts.first">Prev</button>
-  <button (click)="listConfig.nextPage()" [disabled]="posts.last">Next</button>
   <h2>Total: {{ posts.totalElements }} posts!</h2>
-  <table class="bootstrap4Table" style="width: max-content;">
+  <app-pagination-control class="pagination" [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
+  <table class="bootstrap4Table">
     <thead>
       <th id="id" (click)="listConfig.sortChange('id', $event)">
         <div class="sort-right">
@@ -67,9 +62,6 @@
       </tr>
     </tbody>
   </table>
-  <button (click)="listConfig.prevPage()" [disabled]="posts.first">Prev</button>
-  <button (click)="listConfig.nextPage()" [disabled]="posts.last">Next</button>
+  <app-pagination-control class="pagination" [listConfig]="listConfig" [pageResponse]="posts"></app-pagination-control>
 </div>
-<ng-template #loading>
-  Loading stuff...
-</ng-template>
+<ng-template #loading> Loading stuff... </ng-template>

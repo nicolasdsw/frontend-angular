@@ -4,9 +4,9 @@ export interface PageResponse<T> {
   cacheCount: number;
   totalPages: number;
   totalElements: number;
-  size: number;
+  size: number; // page size
   content: T[];
-  number: number;
+  number: number; // page number
   sort: {
     sorted: true;
     unsorted: true;

@@ -1,6 +1,7 @@
 import { FormControl } from '@angular/forms';
-import { PageRequest } from './page-request';
 import { SearchUtil } from '../utils/search-util';
+import { PageRequest } from './page-request';
+import { PageResponse } from './page-response';
 
 const ASC = 'asc';
 const DESC = 'desc';
@@ -56,6 +57,8 @@ export interface ListConfigParams {
   sortOptions: string[];
   sizeControl: FormControl;
   sizeOptions: number[];
+  firstPageBackend?: 0 | 1;
+  maxNavBtns?: number;
   onSizeChange?: () => {};
   onPageChange?: () => {};
   onSortsChange?: () => {};
@@ -67,9 +70,12 @@ export class ListConfig {
   sizeControl: FormControl;
   sizeOptions: number[];
   sizeDefault: number;
+  firstPageBackend: 0 | 1;
+  maxNavBtns: number;
   page: number;
   size: number;
   sorts: SortType;
+  pagesOptions: number[];
   onSizeChange: (newSize: number) => void;
   onPageChange: (newPage: number) => void;
   onSortsChange: (newSorts?: { [by: string]: SortDir }) => void;
@@ -79,6 +85,8 @@ export class ListConfig {
     this.sortOptions = params.sortOptions;
     this.sizeControl = params.sizeControl;
     this.sizeOptions = params.sizeOptions;
+    this.maxNavBtns = params.maxNavBtns || 5;
+    this.firstPageBackend = params.firstPageBackend || 0;
     this.onSizeChange = params.onSizeChange;
     this.onPageChange = params.onPageChange;
     this.onSortsChange = params.onSortsChange;
@@ -90,7 +98,7 @@ export class ListConfig {
     } else {
       this.sizeDefault = this.sizeControl.value;
     }
-    this.page = 0;
+    this.page = 1;
     this.sorts = {};
     this.size = this.sizeDefault;
 
@@ -144,7 +152,8 @@ export class ListConfig {
   }
 
   getPageRequest() {
-    const page = this.page;
+    // Minus 1 if backend pagination is with 0 based index
+    const page = this.firstPageBackend ? this.page : this.page - 1;
     const size = this.size;
     const sort = converSortTypeToSortArr(this.sorts);
     return new PageRequest(page, size, sort);
@@ -156,7 +165,7 @@ export class ListConfig {
 
   setQueryStringValues(page: number, size: number, sortsArr: string[]) {
     this.setSortsArr(sortsArr);
-    this.page = page ? +page : undefined;
+    this.page = page ? +page : 1;
     this.size = size ? +size : this.sizeDefault;
     if (this.size) {
       const val = this.sizeOptions.includes(this.size) ? this.size : null;
@@ -183,27 +192,80 @@ export class ListConfig {
   }
 
   prevPage() {
-    const page = this.page || 0;
-    if (page > 0) {
-      this.page = page - 1;
-      this.pageCallback();
+    const page = this.page || 1;
+    if (page > 1) {
+      this.setPage(page - 1);
     }
   }
 
   nextPage() {
-    const page = this.page || 0;
-    this.page = page + 1;
+    const page = this.page || 1;
+    this.setPage(page + 1);
+  }
+
+  setPage(page: number) {
+    this.page = page || 1;
     this.pageCallback();
   }
 
+  isCurrentPage(page: number) {
+    return this.page === page;
+  }
+
   buildQueryParams(filter: any) {
-    const queryParams = SearchUtil.extractFilled({ ...this.getPageRequest(), ...filter });
-    if (queryParams.page === 0) {
+    const queryParams = SearchUtil.extractFilled({
+      page: this.page,
+      size: this.size,
+      sort: converSortTypeToSortArr(this.sorts),
+      ...filter,
+    });
+    if (queryParams.page === 1) {
       delete queryParams.page;
     }
     if (queryParams.sort?.length === 0) {
       delete queryParams.sort;
     }
     return queryParams;
+  }
+
+  buildPaginationControls(pageResponse: PageResponse<any>) {
+    const maxNavBtns = this.maxNavBtns;
+    const currentPage = this.page;
+    const pageSize = this.size;
+    const itemsRange = (maxNavBtns - 1) / 2;
+    const totalPages = Math.ceil(pageResponse.totalElements / pageSize);
+    let startPage: number;
+    let endPage: number;
+    if (totalPages <= maxNavBtns) {
+      startPage = 1;
+      endPage = totalPages;
+    } else {
+      if (currentPage <= itemsRange) {
+        startPage = 1;
+        endPage = maxNavBtns;
+      } else if (currentPage + itemsRange >= totalPages) {
+        startPage = totalPages - maxNavBtns + 1;
+        endPage = totalPages;
+      } else {
+        startPage = currentPage - itemsRange;
+        endPage = currentPage + itemsRange;
+      }
+    }
+    return [...Array(maxNavBtns).keys()].map((i) => startPage + i);
+  }
+
+  start(pageResponse: PageResponse<any>) {
+    return pageResponse.number * pageResponse.size + 1;
+  }
+
+  end(pageResponse: PageResponse<any>) {
+    let end = pageResponse.totalElements;
+    if (pageResponse.size < pageResponse.totalElements) {
+      end = pageResponse.size * (pageResponse.number + 1);
+      if (end > pageResponse.totalElements) {
+        end = pageResponse.totalElements;
+      }
+    }
+    return end;
   }
 }

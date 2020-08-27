@@ -1,0 +1,11 @@
+.pagination {
+  div {
+    display: inline-block;
+  }
+  div:first-child {
+    margin-right: 2em;
+  }
+  div:last-child {
+    margin-left: 2em;
+  }
+}

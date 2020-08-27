@@ -7,12 +7,13 @@ import { PageRequest } from 'src/app/shared/spring-http/model/page-request';
 import { PageResponse } from 'src/app/shared/spring-http/model/page-response';
 import { SearchUtil } from 'src/app/shared/spring-http/utils/search-util';
 import { catchError } from 'rxjs/operators';
+import { environment } from 'src/environments/environment';
 
 @Injectable({
   providedIn: 'root',
 })
 export class PostsService {
-  private serviceUrl = 'http://localhost:8080/api/posts';
+  private serviceUrl = environment.apiUrl + 'api/posts';
 
   constructor(private http: HttpClient, private swrService: SwrService) {}
 

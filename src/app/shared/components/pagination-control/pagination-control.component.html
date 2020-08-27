@@ -1,0 +1,30 @@
+<div class="pagination">
+  <div>
+    <label>Itens por Página:&nbsp;</label>
+    <select name="pageSize" id="pageSize" [formControl]="listConfig.sizeControl">
+      <option [value]="null">Selecione</option>
+      <option *ngFor="let pageSizeOption of listConfig.sizeOptions" [value]="pageSizeOption">
+        {{ pageSizeOption }}
+      </option>
+    </select>
+  </div>
+  <div>
+    <span
+      >{{ listConfig.start(pageResponse) }} - {{ listConfig.end(pageResponse) }} de
+      {{ pageResponse.totalElements }}</span
+    >
+  </div>
+  <div class="pagination-control">
+    <button (click)="listConfig.setPage(1)" [disabled]="pageResponse.first">First</button>
+    <button (click)="listConfig.prevPage()" [disabled]="pageResponse.first">Prev</button>
+    <button
+      *ngFor="let pageNum of listConfig.buildPaginationControls(pageResponse)"
+      (click)="listConfig.setPage(pageNum)"
+      [disabled]="listConfig.isCurrentPage(pageNum)"
+    >
+      {{ pageNum }}
+    </button>
+    <button (click)="listConfig.nextPage()" [disabled]="pageResponse.last">Next</button>
+    <button (click)="listConfig.setPage(pageResponse.totalPages)" [disabled]="pageResponse.last">Last</button>
+  </div>
+</div>
