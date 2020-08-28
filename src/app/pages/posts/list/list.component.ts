@@ -40,17 +40,22 @@ export class ListComponent implements OnInit {
       this.listConfig.setQueryStringValues(+page, size, sort);
       if (page === '0' || page === '1') {
         this.listConfig.setPage(1);
-      } else if (this.listFilter.formGroup.valid) {
-        this.posts$ = this.postService
-          .findAll(this.listFilter.filter, this.listConfig.getPageRequest())
-          .pipe(tap((responsePage) => this.listConfig.validatePage(responsePage)));
+      } else {
+        this.loadObservable();
       }
     });
   }
 
+  private loadObservable() {
+    if (this.listFilter.formGroup.valid) {
+      this.posts$ = this.postService
+        .findAll(this.listFilter.filter, this.listConfig.getPageRequest())
+        .pipe(tap((responsePage) => this.listConfig.validatePage(responsePage)));
+    }
+  }
+
   private updateQueryStringAndNavigate() {
     const queryParams = this.listConfig.buildQueryParams(this.listFilter.filter);
-    console.log(queryParams);
     this.router.navigate([], { queryParams });
   }
 
